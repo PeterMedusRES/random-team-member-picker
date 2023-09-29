@@ -7,23 +7,20 @@ import {
 } from "chart.js";
 import ChartDataLabels, { type Context } from "chartjs-plugin-datalabels";
 import { Pie } from "react-chartjs-2";
-import { type RouterOutputs } from "~/utils/api";
 
 ChartJS.register(Colors, ArcElement, ChartDataLabels);
 
-type Team = RouterOutputs["teams"]["getById"];
+type MemberProbability = {
+  name: string;
+  probability: number;
+};
 
-const TeamPie = ({ team }: { team: Team }) => {
-  const eligibleMembers = team.members.filter(
-    (member) => member.name != team.lastPicked,
-  );
-  const chances = calculateChances(eligibleMembers);
-
+const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
   const data: ChartData<"pie"> = {
-    labels: eligibleMembers.map((member) => member.name),
+    labels: probabilities.map((member) => member.name),
     datasets: [
       {
-        data: chances,
+        data: probabilities.map((member) => member.probability),
       },
     ],
   };
@@ -50,18 +47,11 @@ const TeamPie = ({ team }: { team: Team }) => {
     },
   };
 
-  return <Pie data={data} options={options} />;
-};
-
-const calculateChances = (members: Team["members"]) => {
-  // The chance of getting picked is inversely proportional to the number of times a member was picked in the past.
-  const inverseProportions = members.map(
-    (member) => 1 / (member.timesPicked + 1),
+  return (
+    <div className="aspect-square w-full">
+      <Pie data={data} options={options} />
+    </div>
   );
-
-  // Calculate the chance as a fraction
-  const denominator = inverseProportions.reduce((a, b) => a + b, 0);
-  return inverseProportions.map((x) => x / denominator);
 };
 
 export default TeamPie;
