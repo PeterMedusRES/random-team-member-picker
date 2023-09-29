@@ -17,6 +17,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+
+  // Needed for Azure Static Web Apps
+  output: "standalone",
 };
 
 export default config;
