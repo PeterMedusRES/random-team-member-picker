@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import TeamPie from "~/components/TeamPie";
+import PickerConfirmation from "./PickerConfirmation";
 import { api, type RouterOutputs } from "~/utils/api";
 
 type Team = RouterOutputs["teams"]["getById"];
@@ -34,7 +35,9 @@ const TeamPicker = () => {
 
   if (status === "error") {
     return (
-      <span className="text-2xl text-red-500">Error: {error.message}</span>
+      <span className="text-xl text-red-500 md:text-2xl">
+        Error: {error?.message}
+      </span>
     );
   }
 
@@ -58,21 +61,26 @@ const TeamPicker = () => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-y-8">
-      <button
-        className="rounded-lg bg-blue-500 p-3 text-lg font-medium text-white hover:bg-blue-400"
-        onClick={chooseTeamMember}
-      >
-        Choose Random Team Member
-      </button>
-      <div className="w-1/4">
+    <div className="flex w-full flex-col items-center">
+      <h2 className="py-4 text-3xl font-bold">Chance of being picked</h2>
+      <div className="w-3/4 max-w-sm">
         <TeamPie probabilities={probabilities} />
       </div>
-      {chosenTeamMember && (
-        <p className="text-4xl text-green-600">
-          <strong>{chosenTeamMember}</strong> was chosen!
-        </p>
-      )}
+      <div className="py-6">
+        {chosenTeamMember ? (
+          <PickerConfirmation
+            chosenTeamMember={chosenTeamMember}
+            onCancel={() => setChosenTeamMember(null)}
+          />
+        ) : (
+          <button
+            className="rounded-lg bg-blue-500 px-4 py-2 text-xl font-medium text-white hover:bg-blue-400"
+            onClick={chooseTeamMember}
+          >
+            Choose Random Team Member
+          </button>
+        )}
+      </div>
     </div>
   );
 };
