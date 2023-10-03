@@ -1,3 +1,5 @@
+import Button from "~/components/Button";
+
 const PickerConfirmation = ({
   chosenTeamMember,
   onAccept,
@@ -14,18 +16,12 @@ const PickerConfirmation = ({
       </em>
       <p className="text-2xl">Do you accept this choice?</p>
       <div className="flex gap-4 pt-3">
-        <button
-          className="w-32 rounded-lg bg-green-500 px-4 py-2 text-xl font-medium text-white hover:bg-green-400"
-          onClick={onAccept}
-        >
+        <Button intent="success" className="w-32" onClick={onAccept}>
           Yes
-        </button>
-        <button
-          className="w-32 rounded-lg bg-red-500 px-4 py-2 text-xl font-medium text-white hover:bg-red-400"
-          onClick={onCancel}
-        >
+        </Button>
+        <Button intent="danger" className="w-32" onClick={onCancel}>
           No
-        </button>
+        </Button>
       </div>
     </div>
   );

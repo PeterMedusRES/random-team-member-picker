@@ -1,7 +1,8 @@
 import { useState } from "react";
+import Button from "~/components/Button";
 import LoadingSpinner from "~/components/LoadingSpinner";
+import PickerConfirmation from "~/components/PickerConfirmation";
 import TeamPie from "~/components/TeamPie";
-import PickerConfirmation from "./PickerConfirmation";
 import { api, type RouterOutputs } from "~/utils/api";
 
 type Team = RouterOutputs["teams"]["getById"];
@@ -73,12 +74,7 @@ const TeamPicker = () => {
             onCancel={() => setChosenTeamMember(null)}
           />
         ) : (
-          <button
-            className="rounded-lg bg-blue-500 px-4 py-2 text-xl font-medium text-white hover:bg-blue-400"
-            onClick={chooseTeamMember}
-          >
-            Choose Random Team Member
-          </button>
+          <Button onClick={chooseTeamMember}>Choose Random Team Member</Button>
         )}
       </div>
     </div>
