@@ -5,8 +5,8 @@ using RandomTeamMemberPicker.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString =
-    builder.Configuration.GetConnectionString("Members") ?? "Data Source=Members.db";
-builder.Services.AddSqlite<MemberDb>(connectionString);
+    builder.Configuration.GetConnectionString("Teams") ?? "Data Source=Teams.db";
+builder.Services.AddSqlite<TeamDb>(connectionString);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -32,7 +32,7 @@ app.UseSwaggerUI(c =>
 
 app.MapGet(
     "/members/{id:int}",
-    async (MemberDb db, int id) =>
+    async (TeamDb db, int id) =>
     {
         var member = await db.Members.FindAsync(id);
         if (member is null)
@@ -43,19 +43,19 @@ app.MapGet(
         return Results.Ok(member);
     }
 );
-app.MapGet("/members", async (MemberDb db) => await db.Members.ToListAsync());
+app.MapGet("/members", async (TeamDb db) => await db.Members.ToListAsync());
 app.MapPost(
     "/members",
-    async (MemberDb db, Member member) =>
+    async (TeamDb db, Member member) =>
     {
         await db.Members.AddAsync(member);
         await db.SaveChangesAsync();
-        return Results.Created($"/members/{member.Id}", member);
+        return Results.Created($"/members/{member.MemberId}", member);
     }
 );
 app.MapPut(
     "/members",
-    async (MemberDb db, Member update, int id) =>
+    async (TeamDb db, Member update, int id) =>
     {
         var member = await db.Members.FindAsync(id);
         if (member is null)
@@ -71,7 +71,7 @@ app.MapPut(
 );
 app.MapDelete(
     "/members/{id:int}",
-    async (MemberDb db, int id) =>
+    async (TeamDb db, int id) =>
     {
         var member = await db.Members.FindAsync(id);
         if (member is null)
