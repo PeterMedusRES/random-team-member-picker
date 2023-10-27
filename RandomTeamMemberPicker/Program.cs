@@ -4,7 +4,9 @@ using RandomTeamMemberPicker.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<MemberDb>(options => options.UseInMemoryDatabase("members"));
+var connectionString =
+    builder.Configuration.GetConnectionString("Members") ?? "Data Source=Members.db";
+builder.Services.AddSqlite<MemberDb>(connectionString);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
