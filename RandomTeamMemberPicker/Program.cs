@@ -1,3 +1,4 @@
+using RandomTeamMemberPicker.Db;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,11 +18,18 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Team Picker API v1");
 });
+
+app.MapGet("/", () => "Hello World!");
+
+app.MapGet("/members/{id:int}", (int id) => MemberDb.GetMember(id));
+app.MapGet("/members", () => MemberDb.GetMembers());
+app.MapPost("/members", (Member member) => MemberDb.CreateMember(member));
+app.MapPut("/members", (Member member) => MemberDb.UpdateMember(member));
+app.MapDelete("/members/{id:int}", (int id) => MemberDb.RemoveMember(id));
 
 app.Run();
