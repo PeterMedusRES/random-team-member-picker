@@ -2,13 +2,12 @@
 
 using System.ComponentModel.DataAnnotations;
 
-public class Member
+public class Team
 {
-    public int MemberId { get; set; }
+    public int TeamId { get; set; }
 
     [Required]
     public string? Name { get; set; }
 
-    public int TeamId { get; set; }
-    public Team Team { get; set; } = null!;
+    public ICollection<Member> Members { get; } = new List<Member>();
 }
