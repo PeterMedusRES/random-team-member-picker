@@ -1,6 +1,7 @@
 ﻿namespace RandomTeamMemberPicker.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RandomTeamMemberPicker.Models;
 
 [Route("api/[controller]")]
@@ -16,36 +17,60 @@ public class TeamsController : ControllerBase
 
     [HttpGet]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-    public IAsyncEnumerable<Team> GetAllTeams()
+    public IAsyncEnumerable<TeamDto> GetAllTeams()
     {
-        return _db.Teams.AsAsyncEnumerable();
+        return _db.Teams
+            .Select(t => new TeamDto { Name = t.Name, TeamId = t.TeamId })
+            .AsAsyncEnumerable();
     }
 
     [HttpGet("{id:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-    public async Task<ActionResult<Team>> GetTeamById(int id)
+    public async Task<ActionResult<TeamDetailDto>> GetTeamById(int id)
     {
-        var team = await _db.Teams.FindAsync(id);
+        var team = await _db.Teams
+            .Include(team => team.Members)
+            .SingleOrDefaultAsync(team => team.TeamId == id);
+
         if (team is null)
         {
             return NotFound();
         }
 
-        return Ok(team);
+        return Ok(
+            new TeamDetailDto
+            {
+                TeamId = team.TeamId,
+                Name = team.Name,
+                Members = team.Members
+                    .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
+                    .ToList(),
+            }
+        );
     }
 
     [HttpPost]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
-    public async Task<ActionResult<Team>> InsertTeam(Team team)
+    public async Task<ActionResult<TeamDetailDto>> InsertTeam(InsertTeamDto team)
     {
-        await _db.Teams.AddAsync(team);
+        var entity = new Team { Name = team.Name };
+        await _db.Teams.AddAsync(entity);
         await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetTeamById), new { id = team.TeamId }, team);
+
+        var teamDetail = new TeamDetailDto
+        {
+            TeamId = entity.TeamId,
+            Name = entity.Name,
+            Members = entity.Members
+                .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
+                .ToList(),
+        };
+        return CreatedAtAction(nameof(GetTeamById), new { id = teamDetail.TeamId }, teamDetail);
     }
 
     [HttpPut("{id:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
-    public async Task<IActionResult> UpdateTeam(Team update, int id)
+    public async Task<IActionResult> UpdateTeam(InsertTeamDto update, int id)
     {
         var team = await _db.Teams.FindAsync(id);
         if (team is null)
