@@ -6,5 +6,7 @@ public class Team
 
     public required string Name { get; set; }
 
+    public int? LastPickedMemberId { get; set; } = null;
+
     public ICollection<Member> Members { get; } = new List<Member>();
 }
