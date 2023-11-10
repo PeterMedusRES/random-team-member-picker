@@ -1,8 +1,8 @@
-﻿namespace RandomTeamMemberPicker.Models;
+﻿namespace RandomTeamMemberPicker.Data;
 
 using System.ComponentModel.DataAnnotations;
 
-public record InsertTeamDto
+public record InsertMemberDto
 {
     [Required]
     public required string Name { get; set; }

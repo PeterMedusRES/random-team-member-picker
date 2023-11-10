@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RandomTeamMemberPicker.Data;
 using RandomTeamMemberPicker.Models;
 
 [Route("api/[controller]")]

@@ -1,4 +1,4 @@
-﻿namespace RandomTeamMemberPicker.Models;
+﻿namespace RandomTeamMemberPicker.Data;
 
 public record TeamDetailDto
 {
