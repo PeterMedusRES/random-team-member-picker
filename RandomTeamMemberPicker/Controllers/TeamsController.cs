@@ -57,7 +57,7 @@ public class TeamsController : ControllerBase
         await _db.Teams.AddAsync(entity);
         await _db.SaveChangesAsync();
 
-        var teamDetail = new TeamDetailDto
+        var teamDetailDto = new TeamDetailDto
         {
             TeamId = entity.TeamId,
             Name = entity.Name,
@@ -65,7 +65,12 @@ public class TeamsController : ControllerBase
                 .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
                 .ToList(),
         };
-        return CreatedAtAction(nameof(GetTeamById), new { id = teamDetail.TeamId }, teamDetail);
+
+        return CreatedAtAction(
+            nameof(GetTeamById),
+            new { id = teamDetailDto.TeamId },
+            teamDetailDto
+        );
     }
 
     [HttpPut("{id:int}")]
@@ -95,6 +100,75 @@ public class TeamsController : ControllerBase
         }
 
         _db.Teams.Remove(team);
+        await _db.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [HttpPost("{id:int}/Members/")]
+    [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
+    public async Task<ActionResult<MemberDto>> InsertMember(InsertMemberDto member, int id)
+    {
+        var team = await _db.Teams.FindAsync(id);
+        if (team is null)
+        {
+            return NotFound();
+        }
+
+        var entity = new Member { Name = member.Name };
+        team.Members.Add(entity);
+
+        await _db.SaveChangesAsync();
+
+        var memberDto = new MemberDto { MemberId = entity.MemberId, Name = entity.Name };
+        return CreatedAtAction(nameof(GetTeamById), new { id = team.TeamId }, memberDto);
+    }
+
+    [HttpPut("{id:int}/Members/{memberId:int}")]
+    [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
+    public async Task<IActionResult> UpdateMember(InsertMemberDto update, int id, int memberId)
+    {
+        var team = await _db.Teams
+            .Include(team => team.Members)
+            .SingleOrDefaultAsync(team => team.TeamId == id);
+        if (team is null)
+        {
+            return NotFound();
+        }
+
+        var member = team.Members.SingleOrDefault(member => member.MemberId == memberId);
+        if (member is null)
+        {
+            return NotFound();
+        }
+
+        member.Name = update.Name;
+
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}/Members/{memberId:int}")]
+    [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
+    public async Task<IActionResult> DeleteMember(int id, int memberId)
+    {
+        var team = await _db.Teams
+            .Include(team => team.Members)
+            .SingleOrDefaultAsync(team => team.TeamId == id);
+        if (team is null)
+        {
+            return NotFound();
+        }
+
+        var member = team.Members.SingleOrDefault(member => member.MemberId == memberId);
+        if (member is null)
+        {
+            return NotFound();
+        }
+
+        team.Members.Remove(member);
+
         await _db.SaveChangesAsync();
 
         return Ok();
