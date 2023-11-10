@@ -43,6 +43,7 @@ public class TeamsController : ControllerBase
             {
                 TeamId = team.TeamId,
                 Name = team.Name,
+                LastPickedMemberId = team.LastPickedMemberId,
                 Members = team.Members
                     .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
                     .ToList(),
@@ -62,6 +63,7 @@ public class TeamsController : ControllerBase
         {
             TeamId = entity.TeamId,
             Name = entity.Name,
+            LastPickedMemberId = entity.LastPickedMemberId,
             Members = entity.Members
                 .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
                 .ToList(),
