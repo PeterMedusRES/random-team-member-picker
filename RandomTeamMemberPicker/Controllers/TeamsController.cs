@@ -45,7 +45,15 @@ public class TeamsController : ControllerBase
                 Name = team.Name,
                 LastPickedMemberId = team.LastPickedMemberId,
                 Members = team.Members
-                    .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
+                    .Select(
+                        m =>
+                            new MemberDto
+                            {
+                                MemberId = m.MemberId,
+                                Name = m.Name,
+                                TimesPicked = m.TimesPicked,
+                            }
+                    )
                     .ToList(),
             }
         );
@@ -65,7 +73,15 @@ public class TeamsController : ControllerBase
             Name = entity.Name,
             LastPickedMemberId = entity.LastPickedMemberId,
             Members = entity.Members
-                .Select(m => new MemberDto { MemberId = m.MemberId, Name = m.Name })
+                .Select(
+                    m =>
+                        new MemberDto
+                        {
+                            MemberId = m.MemberId,
+                            Name = m.Name,
+                            TimesPicked = m.TimesPicked,
+                        }
+                )
                 .ToList(),
         };
 
@@ -123,7 +139,12 @@ public class TeamsController : ControllerBase
 
         await _db.SaveChangesAsync();
 
-        var memberDto = new MemberDto { MemberId = entity.MemberId, Name = entity.Name };
+        var memberDto = new MemberDto
+        {
+            MemberId = entity.MemberId,
+            Name = entity.Name,
+            TimesPicked = entity.TimesPicked,
+        };
         return CreatedAtAction(nameof(GetTeamById), new { id = team.TeamId }, memberDto);
     }
 

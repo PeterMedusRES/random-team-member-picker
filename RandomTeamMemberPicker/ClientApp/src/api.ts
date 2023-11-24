@@ -1,6 +1,7 @@
 export type Member = {
   memberId: number;
   name: string;
+  timesPicked: number;
 };
 
 export type Team = {
@@ -12,7 +13,5 @@ export type Team = {
 
 export const getTeamById = async (id: number) => {
   const res = await fetch(`/api/teams/${id}`);
-  const data = (await res.json()) as Team;
-  console.log(data);
-  return data;
+  return (await res.json()) as Team;
 };

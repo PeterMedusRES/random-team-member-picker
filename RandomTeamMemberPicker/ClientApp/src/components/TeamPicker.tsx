@@ -18,9 +18,7 @@ const calculateMemberProbabilities = (
   // The chance of getting picked is inversely proportional to the number of times a member was picked in the past.
   const weights = new Map(
     [...eligibleMembers.values()].map((member) => {
-      // Random-ish number that won't change between re-renders
-      const timesPicked = ((member.name.length + member.memberId) * 17) % 8;
-      const weight = 1 / (timesPicked + 1);
+      const weight = 1 / (member.timesPicked + 1);
       return [member.memberId, weight];
     }),
   );
