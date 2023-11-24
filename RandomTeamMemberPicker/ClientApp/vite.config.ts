@@ -2,7 +2,7 @@ import react from "@vitejs/plugin-react-swc";
 import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 
 // Get base folder for certificates.
 const baseFolder =
@@ -56,6 +56,11 @@ export default defineConfig(async () => {
 
   const config: UserConfig = {
     plugins: [react()],
+    resolve: {
+      alias: {
+        "~": path.resolve(__dirname, "./src"),
+      },
+    },
     server: {
       port: 5173,
       strictPort: true,
