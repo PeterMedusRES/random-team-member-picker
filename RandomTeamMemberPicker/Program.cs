@@ -24,6 +24,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Make sure the seeded data is added to the in-memory db
+using (var serviceScope = app.Services.CreateScope())
+{
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<TeamDb>();
+    await dbContext.Database.EnsureCreatedAsync();
+}
+
 app.UseSwagger(c =>
 {
     c.RouteTemplate = "/api/swagger/{documentName}/swagger.json";
