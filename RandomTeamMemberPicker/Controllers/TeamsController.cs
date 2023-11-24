@@ -172,6 +172,11 @@ public class TeamsController : ControllerBase
 
         team.Members.Remove(member);
 
+        if (team.LastPickedMemberId == memberId)
+        {
+            team.LastPickedMemberId = null;
+        }
+
         await _db.SaveChangesAsync();
 
         return Ok();
