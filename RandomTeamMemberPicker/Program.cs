@@ -34,6 +34,10 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "api/swagger";
 });
 
+app.UseStaticFiles();
+
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
