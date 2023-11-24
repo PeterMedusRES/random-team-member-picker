@@ -2,8 +2,8 @@ import {
   ArcElement,
   Chart as ChartJS,
   Colors,
-  type ChartOptions,
   type ChartData,
+  type ChartOptions,
 } from "chart.js";
 import ChartDataLabels, { type Context } from "chartjs-plugin-datalabels";
 import { Pie } from "react-chartjs-2";

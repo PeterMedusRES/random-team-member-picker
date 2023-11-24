@@ -1,18 +1,19 @@
+import { type Member } from "~/api";
 import { Button } from "~/components/ui/button";
 
 const PickerConfirmation = ({
-  chosenTeamMember,
+  chosenMember,
   onAccept,
   onCancel,
 }: {
-  chosenTeamMember: string;
+  chosenMember: Member;
   onAccept?: () => void;
   onCancel?: () => void;
 }) => {
   return (
     <div className="flex flex-col items-center gap-2.5">
       <em className="text-2xl">
-        <strong>{chosenTeamMember}</strong> was chosen!
+        <strong>{chosenMember.name}</strong> was chosen!
       </em>
       <p className="text-2xl">Do you accept this choice?</p>
       <div className="flex gap-4 pt-3">
