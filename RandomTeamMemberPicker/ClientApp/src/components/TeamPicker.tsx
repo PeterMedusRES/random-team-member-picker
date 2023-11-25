@@ -2,7 +2,9 @@ import { useState } from "react";
 import { type Member } from "~/api";
 import PickerConfirmation from "~/components/PickerConfirmation";
 import TeamPie from "~/components/TeamPie";
+import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
+import { Skeleton } from "~/components/ui/skeleton";
 import { useTeamQuery } from "~/queries";
 
 const calculateMemberProbabilities = (
@@ -43,7 +45,7 @@ const TeamPicker = () => {
   let chooseRandomMemberId: (() => void) | undefined;
   let content: React.JSX.Element;
   if (isPending) {
-    content = <span>Loading...</span>;
+    content = <Skeleton className="h-full w-full rounded-full" />;
   } else if (isError) {
     content = <span>Error: {error.message}</span>;
   } else {
@@ -70,7 +72,9 @@ const TeamPicker = () => {
   return (
     <div className="flex w-full flex-col items-center">
       <h2 className="py-4 text-3xl font-bold">Chance of being picked</h2>
-      <div className="w-3/4 max-w-sm">{content}</div>
+      <div className="w-4/5 min-w-[15rem] max-w-[20rem]">
+        <AspectRatio ratio={1 / 1}>{content}</AspectRatio>
+      </div>
       <div className="py-6">
         {isSuccess && chosenMember ? (
           <PickerConfirmation

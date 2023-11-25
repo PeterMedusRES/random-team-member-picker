@@ -7,8 +7,22 @@ import {
 } from "chart.js";
 import ChartDataLabels, { type Context } from "chartjs-plugin-datalabels";
 import { Pie } from "react-chartjs-2";
+import colors from "tailwindcss/colors";
 
 ChartJS.register(Colors, ArcElement, ChartDataLabels);
+
+const pieColors = [
+  colors.blue[400],
+  colors.red[400],
+  colors.orange[400],
+  colors.yellow[400],
+  colors.teal[400],
+  colors.violet[400],
+  colors.green[400],
+  colors.fuchsia[400],
+  colors.pink[400],
+  colors.slate[400],
+];
 
 type MemberProbability = {
   name: string;
@@ -21,11 +35,17 @@ const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
     datasets: [
       {
         data: probabilities.map((member) => member.probability),
+        backgroundColor: probabilities.map(
+          (_, i) => pieColors[i % pieColors.length],
+        ),
       },
     ],
   };
 
   const options: ChartOptions<"pie"> = {
+    animation: {
+      animateRotate: false,
+    },
     plugins: {
       datalabels: {
         formatter: (value, context: Context) => {
@@ -36,10 +56,11 @@ const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
 
           return `${name}: ${percentage}%`;
         },
-        backgroundColor: "white",
-        borderRadius: 5,
+        backgroundColor: colors.white,
+        color: colors.slate[900],
+        borderRadius: 4,
         font: {
-          size: 13,
+          size: 12,
           family: "system-ui",
           weight: "normal",
         },
@@ -47,11 +68,7 @@ const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
     },
   };
 
-  return (
-    <div className="aspect-square w-full">
-      <Pie data={data} options={options} />
-    </div>
-  );
+  return <Pie data={data} options={options} />;
 };
 
 export default TeamPie;
