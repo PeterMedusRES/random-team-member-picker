@@ -1,9 +1,9 @@
-import TeamPicker from "~/components/TeamPicker";
+import { TeamPage } from "~/components/TeamPage";
 
 export default function Root() {
   return (
-    <main className="flex w-full flex-col items-center gap-8 px-6 py-8">
-      <TeamPicker />
+    <main className="flex min-h-screen w-full flex-col items-center justify-center p-6">
+      <TeamPage />
     </main>
   );
 }

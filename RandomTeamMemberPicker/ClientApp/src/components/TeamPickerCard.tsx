@@ -1,7 +1,6 @@
-import clsx from "clsx";
 import { HelpCircle } from "lucide-react";
 import { useState } from "react";
-import { type Member } from "~/api";
+import { type Member, type Team } from "~/api";
 import PickerConfirmation from "~/components/PickerConfirmation";
 import TeamPie from "~/components/TeamPie";
 import { AspectRatio } from "~/components/ui/aspect-ratio";
@@ -13,14 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Skeleton } from "~/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { useTeamQuery } from "~/queries";
 
 const calculateMemberProbabilities = (
   members: Member[],
@@ -51,64 +48,38 @@ const calculateMemberProbabilities = (
   return probabilities.sort((member) => member.probability);
 };
 
-const TeamPicker = () => {
+export const TeamPickerCard = ({ team }: { team: Team }) => {
   const [chosenMember, setChosenMember] = useState<Member | undefined>(
     undefined,
   );
-  const { isPending, isError, isSuccess, data: team, error } = useTeamQuery(1);
 
-  let chooseRandomMemberId: (() => void) | undefined;
-  let content: React.JSX.Element;
-  if (isPending) {
-    content = <Skeleton className="h-full w-full rounded-full" />;
-  } else if (isError) {
-    content = <span>Error: {error.message}</span>;
-  } else {
-    const probabilities = calculateMemberProbabilities(
-      team.members,
-      team.lastPickedMemberId,
-    );
+  const probabilities = calculateMemberProbabilities(
+    team.members,
+    team.lastPickedMemberId,
+  );
 
-    chooseRandomMemberId = () => {
-      const randomNumber = Math.random();
+  const chooseRandomMemberId = () => {
+    const randomNumber = Math.random();
 
-      let upperBound = 0;
-      for (const member of probabilities) {
-        upperBound += member.probability;
-        if (randomNumber <= upperBound) {
-          setChosenMember(member);
-          break;
-        }
+    let upperBound = 0;
+    for (const member of probabilities) {
+      upperBound += member.probability;
+      if (randomNumber <= upperBound) {
+        setChosenMember(member);
+        break;
       }
-    };
-    content = <TeamPie probabilities={probabilities} />;
-  }
+    }
+  };
 
   return (
-    <Card className="w-[24rem]">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-5">
-        <CardTitle>
-          {isPending
-            ? "Loading..."
-            : isError
-              ? "Error"
-              : "Chance of being picked"}
-        </CardTitle>
+    <Card className="h-[32rem] w-[24rem]">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle>Chance of being picked</CardTitle>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="link"
-                size="icon"
-                disabled={!isSuccess}
-                className="cursor-help"
-              >
-                <HelpCircle
-                  className={clsx(
-                    "text-muted-foreground",
-                    !isSuccess && "hidden",
-                  )}
-                />
+              <Button variant="link" size="icon" className="cursor-help">
+                <HelpCircle className="text-muted-foreground" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="w-80">
@@ -122,16 +93,18 @@ const TeamPicker = () => {
         </TooltipProvider>
       </CardHeader>
       <CardContent>
-        <AspectRatio ratio={1}>{content}</AspectRatio>
+        <AspectRatio ratio={1}>
+          <TeamPie probabilities={probabilities} />
+        </AspectRatio>
       </CardContent>
       <CardFooter className="flex justify-center">
-        {isSuccess && chosenMember ? (
+        {chosenMember ? (
           <PickerConfirmation
             chosenMember={chosenMember}
             onCancel={() => setChosenMember(undefined)}
           />
         ) : (
-          <Button disabled={!isSuccess} onClick={chooseRandomMemberId}>
+          <Button onClick={chooseRandomMemberId}>
             Choose Random Team Member
           </Button>
         )}
@@ -139,5 +112,3 @@ const TeamPicker = () => {
     </Card>
   );
 };
-
-export default TeamPicker;
