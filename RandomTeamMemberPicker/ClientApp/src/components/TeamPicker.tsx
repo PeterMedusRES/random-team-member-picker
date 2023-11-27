@@ -1,10 +1,25 @@
+import clsx from "clsx";
+import { HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { type Member } from "~/api";
 import PickerConfirmation from "~/components/PickerConfirmation";
 import TeamPie from "~/components/TeamPie";
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { useTeamQuery } from "~/queries";
 
 const calculateMemberProbabilities = (
@@ -70,12 +85,43 @@ const TeamPicker = () => {
   }
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <h2 className="py-4 text-3xl font-bold">Chance of being picked</h2>
-      <div className="w-4/5 min-w-[15rem] max-w-[20rem]">
-        <AspectRatio ratio={1 / 1}>{content}</AspectRatio>
-      </div>
-      <div className="py-6">
+    <Card className="w-[24rem]">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-5">
+        <CardTitle>
+          {isPending
+            ? "Loading..."
+            : isError
+              ? "Error"
+              : "Chance of being picked"}
+        </CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="link"
+                size="icon"
+                disabled={!isSuccess}
+                className="cursor-help"
+              >
+                <HelpCircle
+                  className={clsx("text-slate-500", !isSuccess && "hidden")}
+                />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="w-80">
+              <p>
+                The probability of a team member being picked is{" "}
+                <em>inversely proportional</em> to the number of times they have
+                been picked in the past.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </CardHeader>
+      <CardContent>
+        <AspectRatio ratio={1}>{content}</AspectRatio>
+      </CardContent>
+      <CardFooter className="flex justify-center">
         {isSuccess && chosenMember ? (
           <PickerConfirmation
             chosenMember={chosenMember}
@@ -86,8 +132,8 @@ const TeamPicker = () => {
             Choose Random Team Member
           </Button>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 
