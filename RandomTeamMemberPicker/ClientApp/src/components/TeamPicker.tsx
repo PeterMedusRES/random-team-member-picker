@@ -104,7 +104,10 @@ const TeamPicker = () => {
                 className="cursor-help"
               >
                 <HelpCircle
-                  className={clsx("text-slate-500", !isSuccess && "hidden")}
+                  className={clsx(
+                    "text-muted-foreground",
+                    !isSuccess && "hidden",
+                  )}
                 />
               </Button>
             </TooltipTrigger>
