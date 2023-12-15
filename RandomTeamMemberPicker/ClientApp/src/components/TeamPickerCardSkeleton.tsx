@@ -18,7 +18,7 @@ export const TeamPickerCardSkeleton = () => {
         <Skeleton className="aspect-square h-full w-full rounded-full" />
       </CardContent>
       <CardFooter className="flex justify-center">
-        <Skeleton className="h-10 w-56" />
+        <Skeleton className="h-10 grow" />
       </CardFooter>
     </Card>
   );

@@ -1,7 +1,6 @@
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { type Member, type Team } from "~/api";
-import PickerConfirmation from "~/components/PickerConfirmation";
 import TeamPie from "~/components/TeamPie";
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
@@ -74,7 +73,7 @@ export const TeamPickerCard = ({ team }: { team: Team }) => {
   return (
     <Card className="h-[32rem] w-[24rem]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle>Chance of being picked</CardTitle>
+        <CardTitle>Team Member Picker</CardTitle>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -94,17 +93,37 @@ export const TeamPickerCard = ({ team }: { team: Team }) => {
       </CardHeader>
       <CardContent>
         <AspectRatio ratio={1}>
-          <TeamPie probabilities={probabilities} />
+          {chosenMember ? (
+            <div className="flex h-full flex-col items-center justify-center gap-2.5">
+              <h3 className="text-2xl tracking-tight">
+                <strong>{chosenMember.name}</strong> was chosen!
+              </h3>
+              <div className="text-lg font-semibold">
+                Do you accept this choice?
+              </div>
+            </div>
+          ) : (
+            <TeamPie probabilities={probabilities} />
+          )}
         </AspectRatio>
       </CardContent>
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex justify-center gap-4">
         {chosenMember ? (
-          <PickerConfirmation
-            chosenMember={chosenMember}
-            onCancel={() => setChosenMember(undefined)}
-          />
+          <>
+            <Button variant="success" className="grow">
+              Yes
+            </Button>
+            <Button
+              onClick={() => setChosenMember(undefined)}
+              variant="destructive"
+              className="grow"
+            >
+              No
+            </Button>
+          </>
         ) : (
-          <Button onClick={chooseRandomMemberId}>
+          <Button onClick={chooseRandomMemberId} className="grow">
+            <RefreshCw className="mr-2 h-4 w-4" />
             Choose Random Team Member
           </Button>
         )}
