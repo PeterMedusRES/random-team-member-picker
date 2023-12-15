@@ -7,20 +7,13 @@ using RandomTeamMemberPicker.Models;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TeamsController : ControllerBase
+public class TeamsController(TeamDb db) : ControllerBase
 {
-    private readonly TeamDb _db;
-
-    public TeamsController(TeamDb db)
-    {
-        _db = db;
-    }
-
     [HttpGet]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
     public IAsyncEnumerable<TeamDto> GetAllTeams()
     {
-        return _db.Teams
+        return db.Teams
             .Select(t => new TeamDto { Name = t.Name, TeamId = t.TeamId })
             .AsAsyncEnumerable();
     }
@@ -29,7 +22,7 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
     public async Task<ActionResult<TeamDetailDto>> GetTeamById(int id)
     {
-        var team = await _db.Teams
+        var team = await db.Teams
             .Include(team => team.Members)
             .SingleOrDefaultAsync(team => team.TeamId == id);
 
@@ -64,8 +57,8 @@ public class TeamsController : ControllerBase
     public async Task<ActionResult<TeamDetailDto>> InsertTeam(InsertTeamDto team)
     {
         var entity = new Team { Name = team.Name };
-        await _db.Teams.AddAsync(entity);
-        await _db.SaveChangesAsync();
+        await db.Teams.AddAsync(entity);
+        await db.SaveChangesAsync();
 
         var teamDetailDto = new TeamDetailDto
         {
@@ -96,14 +89,14 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
     public async Task<IActionResult> UpdateTeam(InsertTeamDto update, int id)
     {
-        var team = await _db.Teams.FindAsync(id);
+        var team = await db.Teams.FindAsync(id);
         if (team is null)
         {
             return NotFound();
         }
 
         team.Name = update.Name;
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return NoContent();
     }
@@ -112,14 +105,14 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
     public async Task<IActionResult> DeleteTeam(int id)
     {
-        var team = await _db.Teams.FindAsync(id);
+        var team = await db.Teams.FindAsync(id);
         if (team is null)
         {
             return NotFound();
         }
 
-        _db.Teams.Remove(team);
-        await _db.SaveChangesAsync();
+        db.Teams.Remove(team);
+        await db.SaveChangesAsync();
 
         return Ok();
     }
@@ -128,7 +121,7 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
     public async Task<ActionResult<MemberDto>> InsertMember(InsertMemberDto member, int id)
     {
-        var team = await _db.Teams.FindAsync(id);
+        var team = await db.Teams.FindAsync(id);
         if (team is null)
         {
             return NotFound();
@@ -137,7 +130,7 @@ public class TeamsController : ControllerBase
         var entity = new Member { Name = member.Name };
         team.Members.Add(entity);
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         var memberDto = new MemberDto
         {
@@ -152,7 +145,7 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
     public async Task<IActionResult> UpdateMember(InsertMemberDto update, int id, int memberId)
     {
-        var team = await _db.Teams
+        var team = await db.Teams
             .Include(team => team.Members)
             .SingleOrDefaultAsync(team => team.TeamId == id);
         if (team is null)
@@ -168,7 +161,7 @@ public class TeamsController : ControllerBase
 
         member.Name = update.Name;
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return NoContent();
     }
@@ -177,7 +170,7 @@ public class TeamsController : ControllerBase
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
     public async Task<IActionResult> DeleteMember(int id, int memberId)
     {
-        var team = await _db.Teams
+        var team = await db.Teams
             .Include(team => team.Members)
             .SingleOrDefaultAsync(team => team.TeamId == id);
         if (team is null)
@@ -198,7 +191,7 @@ public class TeamsController : ControllerBase
             team.LastPickedMemberId = null;
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return Ok();
     }

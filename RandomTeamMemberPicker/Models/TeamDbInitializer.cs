@@ -2,18 +2,11 @@
 
 using Microsoft.EntityFrameworkCore;
 
-public class TeamDbInitializer
+public class TeamDbInitializer(ModelBuilder modelBuilder)
 {
-    private readonly ModelBuilder _modelBuilder;
-
-    public TeamDbInitializer(ModelBuilder modelBuilder)
-    {
-        this._modelBuilder = modelBuilder;
-    }
-
     public void Seed()
     {
-        this._modelBuilder
+        modelBuilder
             .Entity<Team>()
             .HasData(
                 new Team
@@ -24,7 +17,7 @@ public class TeamDbInitializer
                 }
             );
 
-        this._modelBuilder
+        modelBuilder
             .Entity<Member>()
             .HasData(
                 new Member

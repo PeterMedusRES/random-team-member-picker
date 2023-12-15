@@ -2,11 +2,8 @@
 
 using Microsoft.EntityFrameworkCore;
 
-public class TeamDb : DbContext
+public class TeamDb(DbContextOptions options) : DbContext(options)
 {
-    public TeamDb(DbContextOptions options)
-        : base(options) { }
-
     public DbSet<Team> Teams { get; set; } = null!;
     public DbSet<Member> Members { get; set; } = null!;
 
