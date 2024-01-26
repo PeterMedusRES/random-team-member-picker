@@ -10,7 +10,7 @@ const config = {
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
   ],
-  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  ignorePatterns: ["dist", ".eslintrc.cjs", "src/generated"],
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh"],
   rules: {
