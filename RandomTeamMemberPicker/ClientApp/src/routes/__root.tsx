@@ -1,16 +1,16 @@
-import { TeamPage } from "~/components/TeamPage";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { ThemeDropdown } from "~/components/ThemeDropdown";
 
-export default function Root() {
-  return (
+export const Route = createRootRoute({
+  component: () => (
     <div className="flex min-h-screen w-full flex-col">
       <header className="flex h-16 items-center px-4">
         <div className="m-auto" />
         <ThemeDropdown />
       </header>
       <main className="flex w-full grow flex-col items-center justify-center p-6">
-        <TeamPage />
+        <Outlet />
       </main>
     </div>
-  );
-}
+  ),
+});

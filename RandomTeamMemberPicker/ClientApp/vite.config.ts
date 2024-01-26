@@ -1,3 +1,4 @@
+import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { spawn } from "child_process";
 import fs from "fs";
@@ -55,7 +56,7 @@ export default defineConfig(async () => {
   }
 
   const config: UserConfig = {
-    plugins: [react()],
+    plugins: [react(), TanStackRouterVite()],
     resolve: {
       alias: {
         "~": path.resolve(__dirname, "./src"),
