@@ -13,5 +13,8 @@ export type Team = {
 
 export const getTeamById = async (id: number) => {
   const res = await fetch(`/api/teams/${id}`);
+  if (!res.ok) {
+    throw new Error(`Failed to load team ${id}: ${res.statusText}`);
+  }
   return (await res.json()) as Team;
 };

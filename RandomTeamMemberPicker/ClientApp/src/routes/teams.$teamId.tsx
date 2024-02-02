@@ -9,23 +9,11 @@ export const Route = createFileRoute("/teams/$teamId")({
     await context.queryClient.ensureQueryData(teamQueryOptions(1));
   },
   component: TeamPage,
+  pendingComponent: TeamPickerCardSkeleton,
 });
 
 function TeamPage() {
-  const {
-    data: team,
-    isPending,
-    isError,
-    error,
-  } = useQuery(teamQueryOptions(1));
-
-  if (isPending) {
-    return <TeamPickerCardSkeleton />;
-  }
-
-  if (isError) {
-    return <span>Error: {error.message}</span>;
-  }
+  const { data: team } = useSuspenseQuery(teamQueryOptions(1));
 
   return <TeamPickerCard team={team} />;
 }
