@@ -5,6 +5,9 @@ import { TeamPickerCardSkeleton } from "~/components/TeamPickerCardSkeleton";
 import { teamQueryOptions } from "~/queries";
 
 export const Route = createFileRoute("/teams/$teamId")({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(teamQueryOptions(1));
+  },
   component: TeamPage,
 });
 
