@@ -5,7 +5,7 @@ export const Route = createFileRoute("/teams/")({
   component: () => (
     <Button asChild>
       <Link to="/teams/$teamId" params={{ teamId: "1" }}>
-        Go to UNO Data Team
+        Go to UNO Data Team Demos
       </Link>
     </Button>
   ),
