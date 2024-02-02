@@ -30,7 +30,8 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "valibot": "^0.27.1"
   },
   "devDependencies": {
     "@tanstack/router-cli": "^1.15.10",
