@@ -1,9 +1,15 @@
+import { useQuery } from "@tanstack/react-query";
 import { TeamPickerCard } from "~/components/TeamPickerCard";
 import { TeamPickerCardSkeleton } from "~/components/TeamPickerCardSkeleton";
-import { useTeamQuery } from "~/queries";
+import { teamQueryOptions } from "~/queries";
 
 export const TeamPage = () => {
-  const { data: team, isPending, isError, error } = useTeamQuery(1);
+  const {
+    data: team,
+    isPending,
+    isError,
+    error,
+  } = useQuery(teamQueryOptions(1));
 
   if (isPending) {
     return <TeamPickerCardSkeleton />;
