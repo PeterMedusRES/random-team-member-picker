@@ -1,6 +1,6 @@
 import { HelpCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import type { Member, Team } from "~/api";
+import type { Member, TeamDetail } from "~/api";
 import TeamPie from "~/components/TeamPie";
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
@@ -47,7 +47,7 @@ const calculateMemberProbabilities = (
   return probabilities.sort((member) => member.probability);
 };
 
-export const TeamPickerCard = ({ team }: { team: Team }) => {
+export const TeamPickerCard = ({ team }: { team: TeamDetail }) => {
   const [chosenMember, setChosenMember] = useState<Member | undefined>(
     undefined,
   );
