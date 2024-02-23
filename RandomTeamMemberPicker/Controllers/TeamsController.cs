@@ -14,7 +14,12 @@ public class TeamsController(TeamDb db) : ControllerBase
     public IAsyncEnumerable<TeamDto> GetAllTeams()
     {
         return db.Teams
-            .Select(t => new TeamDto { Name = t.Name, TeamId = t.TeamId })
+            .Select(t => new TeamDto
+            {
+                Name = t.Name,
+                TeamId = t.TeamId,
+                MemberCount = t.Members.Count,
+            })
             .AsAsyncEnumerable();
     }
 
