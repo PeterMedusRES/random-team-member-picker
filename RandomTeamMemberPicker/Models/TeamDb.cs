@@ -10,6 +10,10 @@ public class TeamDb(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        new TeamDbInitializer(modelBuilder).Seed();
+
+        SeedData.Init();
+
+        modelBuilder.Entity<Team>().HasData(SeedData.Teams);
+        modelBuilder.Entity<Member>().HasData(SeedData.Members);
     }
 }
