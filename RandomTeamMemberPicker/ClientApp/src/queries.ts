@@ -1,5 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getTeamById } from "~/api";
+import { getAllTeams, getTeamById } from "~/api";
+
+export const teamsQueryOptions = () =>
+  queryOptions({
+    queryKey: ["teams"],
+    queryFn: async () => await getAllTeams(),
+  });
 
 export const teamQueryOptions = (id: number) =>
   queryOptions({
