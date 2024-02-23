@@ -36,7 +36,7 @@ function RootComponent() {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
-        <header className="flex h-16 items-center px-4">
+        <header className="sticky top-0 z-0 flex h-16 items-center border-b bg-background px-4">
           <MatchRoute from="/teams/$teamId">
             <Button size="sm" variant="ghost" asChild>
               <Link to="/teams">
