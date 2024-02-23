@@ -132,6 +132,6 @@ public static class SeedData
             ]
         );
 
-        GenerateFakeTeams(5);
+        GenerateFakeTeams(10);
     }
 }
