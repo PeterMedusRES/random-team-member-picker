@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{B73D1C34
 		.gitignore = .gitignore
 		.github\workflows\aspnet_random-team-member-picker.yml = .github\workflows\aspnet_random-team-member-picker.yml
 		.config\dotnet-tools.json = .config\dotnet-tools.json
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Global
