@@ -30,8 +30,8 @@ const calculatePieColors = (displayTheme: DisplayTheme) => {
     slices: [
       colors.blue[sliceShade],
       colors.red[sliceShade],
-      colors.orange[sliceShade],
       colors.yellow[sliceShade],
+      colors.orange[sliceShade],
       colors.teal[sliceShade],
       colors.violet[sliceShade],
       colors.green[sliceShade],
@@ -47,7 +47,11 @@ type MemberProbability = {
   probability: number;
 };
 
-const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
+export function TeamPie({
+  probabilities,
+}: {
+  probabilities: MemberProbability[];
+}) {
   const { displayTheme } = useTheme();
   const pieColors = calculatePieColors(displayTheme);
 
@@ -96,11 +100,20 @@ const TeamPie = ({ probabilities }: { probabilities: MemberProbability[] }) => {
           family: "system-ui",
           weight: "normal",
         },
+        rotation: (context: Context) => {
+          const probability = probabilities[context.dataIndex]!.probability;
+          const cumulativeProbability = probabilities
+            .filter((_, i) => i < context.dataIndex)
+            .map((m) => m.probability)
+            .reduce((a, b) => a + b, 0);
+
+          const pieAngle = (cumulativeProbability + probability * 0.5) * 360;
+
+          return pieAngle < 180 ? pieAngle - 90 : pieAngle + 90;
+        },
       },
     },
   };
 
   return <Pie data={data} options={options} />;
-};
-
-export default TeamPie;
+}

@@ -1,7 +1,7 @@
 import { HelpCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import type { Member, TeamDetail } from "~/api";
-import TeamPie from "~/components/TeamPie";
+import { TeamPie } from "~/components/TeamPie";
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
 import {
