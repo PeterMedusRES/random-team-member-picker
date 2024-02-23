@@ -98,9 +98,7 @@ export const TeamPickerCard = ({ team }: { team: TeamDetail }) => {
               <h3 className="text-2xl tracking-tight">
                 <strong>{chosenMember.name}</strong> was chosen!
               </h3>
-              <div className="text-lg font-semibold">
-                Do you accept this choice?
-              </div>
+              <div className="text-lg">Do you accept this choice?</div>
             </div>
           ) : (
             <TeamPie probabilities={probabilities} />

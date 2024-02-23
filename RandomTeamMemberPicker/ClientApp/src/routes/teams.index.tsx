@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { createFileRoute } from "@tanstack/react-router";
+import { TeamCard } from "~/components/TeamCard";
 import { teamsQueryOptions } from "~/queries";
 
 export const Route = createFileRoute("/teams/")({
@@ -14,13 +14,9 @@ function TeamsList() {
   const { data } = useSuspenseQuery(teamsQueryOptions());
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-4">
+    <div className="flex w-full max-w-md flex-col gap-4">
       {data.teams.map((team) => (
-        <Button key={team.teamId} asChild>
-          <Link to="/teams/$teamId" params={{ teamId: team.teamId }}>
-            Go to {team.name}
-          </Link>
-        </Button>
+        <TeamCard key={team.teamId} team={team} />
       ))}
     </div>
   );
