@@ -11,16 +11,21 @@ public class TeamsController(TeamDb db) : ControllerBase
 {
     [HttpGet]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-    public IAsyncEnumerable<TeamDto> GetAllTeams()
+    public ActionResult<TeamListDto> GetAllTeams()
     {
-        return db.Teams
-            .Select(t => new TeamDto
+        return Ok(
+            new TeamListDto
             {
-                Name = t.Name,
-                TeamId = t.TeamId,
-                MemberCount = t.Members.Count,
-            })
-            .AsAsyncEnumerable();
+                Teams = db.Teams
+                    .Select(t => new TeamDto
+                    {
+                        Name = t.Name,
+                        TeamId = t.TeamId,
+                        MemberCount = t.Members.Count,
+                    })
+                    .AsEnumerable(),
+            }
+        );
     }
 
     [HttpGet("{id:int}")]
