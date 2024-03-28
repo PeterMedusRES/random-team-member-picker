@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RandomTeamMemberPicker;
 using RandomTeamMemberPicker.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     );
 });
+
+builder.Services.AddScoped<ITeamsRepository, SqlTeamsRepository>();
 
 var app = builder.Build();
 

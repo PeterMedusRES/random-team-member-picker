@@ -1,208 +1,92 @@
 ﻿namespace RandomTeamMemberPicker.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RandomTeamMemberPicker.Data;
-using RandomTeamMemberPicker.Models;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TeamsController(TeamDb db) : ControllerBase
+public class TeamsController(ITeamsRepository teamsRepository) : ControllerBase
 {
     [HttpGet]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-    public ActionResult<TeamListDto> GetAllTeams()
-    {
-        return Ok(
-            new TeamListDto
-            {
-                Teams = db.Teams
-                    .Select(t => new TeamDto
-                    {
-                        Name = t.Name,
-                        TeamId = t.TeamId,
-                        MemberCount = t.Members.Count,
-                    })
-                    .AsEnumerable(),
-            }
-        );
-    }
+    public async Task<ActionResult<TeamListDto>> GetAllTeams() => Ok(await teamsRepository.GetAllTeamsAsync());
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{teamId:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-    public async Task<ActionResult<TeamDetailDto>> GetTeamById(int id)
+    public async Task<ActionResult<TeamDetailDto>> GetTeamById(int teamId)
     {
-        var team = await db.Teams
-            .Include(team => team.Members)
-            .SingleOrDefaultAsync(team => team.TeamId == id);
+        var team = await teamsRepository.GetTeamByIdAsync(teamId);
 
-        if (team is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(
-            new TeamDetailDto
-            {
-                TeamId = team.TeamId,
-                Name = team.Name,
-                LastPickedMemberId = team.LastPickedMemberId,
-                Members = team.Members
-                    .Select(
-                        m =>
-                            new MemberDto
-                            {
-                                MemberId = m.MemberId,
-                                Name = m.Name,
-                                TimesPicked = m.TimesPicked,
-                            }
-                    )
-                    .ToList(),
-            }
-        );
+        return team is not null ? Ok(team) : NotFound();
     }
 
     [HttpPost]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
-    public async Task<ActionResult<TeamDetailDto>> InsertTeam(InsertTeamDto team)
+    public async Task<ActionResult<TeamDetailDto>> InsertTeam(InsertTeamDto teamToInsert)
     {
-        var entity = new Team { Name = team.Name };
-        await db.Teams.AddAsync(entity);
-        await db.SaveChangesAsync();
+        var createdTeam = await teamsRepository.InsertTeamAsync(teamToInsert);
 
-        var teamDetailDto = new TeamDetailDto
-        {
-            TeamId = entity.TeamId,
-            Name = entity.Name,
-            LastPickedMemberId = entity.LastPickedMemberId,
-            Members = entity.Members
-                .Select(
-                    m =>
-                        new MemberDto
-                        {
-                            MemberId = m.MemberId,
-                            Name = m.Name,
-                            TimesPicked = m.TimesPicked,
-                        }
-                )
-                .ToList(),
-        };
-
-        return CreatedAtAction(
-            nameof(GetTeamById),
-            new { id = teamDetailDto.TeamId },
-            teamDetailDto
-        );
+        return CreatedAtAction(nameof(GetTeamById), new { teamId = createdTeam.TeamId }, createdTeam);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{teamId:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
-    public async Task<IActionResult> UpdateTeam(InsertTeamDto update, int id)
+    public async Task<IActionResult> UpdateTeam(int teamId, InsertTeamDto teamToUpdate)
     {
-        var team = await db.Teams.FindAsync(id);
-        if (team is null)
+        if (await teamsRepository.UpdateTeamAsync(teamId, teamToUpdate))
         {
-            return NotFound();
+            return NoContent();
         }
 
-        team.Name = update.Name;
-        await db.SaveChangesAsync();
-
-        return NoContent();
+        return NotFound();
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{teamId:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
-    public async Task<IActionResult> DeleteTeam(int id)
+    public async Task<IActionResult> DeleteTeam(int teamId)
     {
-        var team = await db.Teams.FindAsync(id);
-        if (team is null)
+        if (await teamsRepository.DeleteTeamAsync(teamId))
         {
-            return NotFound();
+            return Ok();
         }
 
-        db.Teams.Remove(team);
-        await db.SaveChangesAsync();
-
-        return Ok();
+        return NotFound();
     }
 
-    [HttpPost("{id:int}/Members/")]
+    [HttpPost("{teamId:int}/Members/")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
-    public async Task<ActionResult<MemberDto>> InsertMember(InsertMemberDto member, int id)
+    public async Task<ActionResult<MemberDto>> InsertMember(int teamId, InsertMemberDto memberToInsert)
     {
-        var team = await db.Teams.FindAsync(id);
-        if (team is null)
+        var createdMember = await teamsRepository.InsertMemberAsync(teamId, memberToInsert);
+        if (createdMember is null)
         {
             return NotFound();
         }
 
-        var entity = new Member { Name = member.Name };
-        team.Members.Add(entity);
-
-        await db.SaveChangesAsync();
-
-        var memberDto = new MemberDto
-        {
-            MemberId = entity.MemberId,
-            Name = entity.Name,
-            TimesPicked = entity.TimesPicked,
-        };
-        return CreatedAtAction(nameof(GetTeamById), new { id = team.TeamId }, memberDto);
+        return CreatedAtAction(nameof(GetTeamById), new { teamId }, createdMember);
     }
 
-    [HttpPut("{id:int}/Members/{memberId:int}")]
+    [HttpPut("{teamId:int}/Members/{memberId:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
-    public async Task<IActionResult> UpdateMember(InsertMemberDto update, int id, int memberId)
+    public async Task<IActionResult> UpdateMember(int teamId, int memberId, InsertMemberDto memberToUpdate)
     {
-        var team = await db.Teams
-            .Include(team => team.Members)
-            .SingleOrDefaultAsync(team => team.TeamId == id);
-        if (team is null)
+        if (await teamsRepository.UpdateMemberAsync(teamId, memberId, memberToUpdate))
         {
-            return NotFound();
+            return NoContent();
         }
 
-        var member = team.Members.SingleOrDefault(member => member.MemberId == memberId);
-        if (member is null)
-        {
-            return NotFound();
-        }
-
-        member.Name = update.Name;
-
-        await db.SaveChangesAsync();
-
-        return NoContent();
+        return NotFound();
     }
 
-    [HttpDelete("{id:int}/Members/{memberId:int}")]
+    [HttpDelete("{teamId:int}/Members/{memberId:int}")]
     [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
-    public async Task<IActionResult> DeleteMember(int id, int memberId)
+    public async Task<IActionResult> DeleteMember(int teamId, int memberId)
     {
-        var team = await db.Teams
-            .Include(team => team.Members)
-            .SingleOrDefaultAsync(team => team.TeamId == id);
-        if (team is null)
+        if (await teamsRepository.DeleteMemberAsync(teamId, memberId))
         {
-            return NotFound();
+            return Ok();
         }
 
-        var member = team.Members.SingleOrDefault(member => member.MemberId == memberId);
-        if (member is null)
-        {
-            return NotFound();
-        }
-
-        team.Members.Remove(member);
-
-        if (team.LastPickedMemberId == memberId)
-        {
-            team.LastPickedMemberId = null;
-        }
-
-        await db.SaveChangesAsync();
-
-        return Ok();
+        return NotFound();
     }
 }
