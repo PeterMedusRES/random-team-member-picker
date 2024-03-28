@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
@@ -26,30 +27,38 @@ jobs:
         with:
           version: 8
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: ClientApp/pnpm-lock.yaml
 
-      - name: Build with dotnet
+      - name: dotnet build
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish --configuration Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./RandomTeamMemberPicker/RandomTeamMemberPicker.csproj --configuration Release --output ./app
 
-      - name: Upload artifact for deployment job
+      - name: Upload backend artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: backend
+          path: ./app
+
+      - name: pnpm install
+        working-directory: ClientApp
+        run: pnpm install
+
+      - name: pnpm run build
+        working-directory: ClientApp
+        run: pnpm run build
+
+      - name: Upload frontend artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: ./ClientApp/dist
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,10 +68,17 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
+      - name: Download backend artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: backend
+          path: ./app
+
+      - name: Download frontend artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: ./app/wwwroot
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -71,4 +87,4 @@ jobs:
           app-name: 'random-team-member-picker'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6BF3BE64D65B42A190D21267C589A478 }}
-          package: .
+          package: ./app
